@@ -5,25 +5,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const statusElement = document.getElementById('status');
   const dateList = document.getElementById('dateList');
   
-  let numbers = []; // Array to store numbers for the chart
+  let dates = JSON.parse(localStorage.getItem('msUpdateDates')) || []; // Retrieve stored dates or initialize to an empty array
 
   updateDateButton.addEventListener('click', () => {
-    const currentDate = new Date().toISOString();
-    numbers.push(currentDate); // Push current date to numbers array
+    const currentDate = new Date();
+    dates.push(currentDate); // Push current date to dates array
 
-    localStorage.setItem('msUpdateDates', JSON.stringify(numbers));
-    alert('Date updated!');
+    localStorage.setItem('msUpdateDates', JSON.stringify(dates));
+    alert(`Date updated to: ${currentDate.toLocaleString()}`);
 
-    // Update the chart with numbers array
+    // Update the chart with dates array
     updateChart();
   });
 
   checkStatusButton.addEventListener('click', () => {
-    const dates = JSON.parse(localStorage.getItem('msUpdateDates')) || [];
     if (dates.length === 0) {
       statusElement.textContent = 'No dates stored';
       // If no dates stored, reset the chart to show zero
-      numbers = [];
       updateChart();
       return;
     }
@@ -36,21 +34,28 @@ document.addEventListener('DOMContentLoaded', () => {
     if (diffDays < 5) {
       statusElement.textContent = `Sorry, you cannot ms after ${5 - diffDays} days.`;
     } else {
-      statusElement.textContent = 'You can ms <br> after ms you will update ms';
+      statusElement.innerHTML = 'You can ms <br> after ms you will update ms';
     }
 
-    // Update the chart with numbers array
+    // Update the chart with dates array
     updateChart();
   });
 
   viewDatesButton.addEventListener('click', () => {
-    const dates = JSON.parse(localStorage.getItem('msUpdateDates')) || [];
     dateList.innerHTML = ''; // Clear the list before displaying
-    dates.forEach(date => {
+
+    dates.forEach((date, index) => {
       const listItem = document.createElement('li');
-      listItem.textContent = new Date(date).toLocaleString();
-      dateList.appendChild(listItem);
+      listItem.textContent = new Date(date).toLocaleString(); // Convert to local date and time string
+      listItem.classList.add('fade-in'); // Add fade-in class for animation
+      setTimeout(() => {
+        dateList.appendChild(listItem);
+      }, index * 100); // Stagger the display of each date by 100ms
     });
+
+    // Play sound on click
+    const audio = new Audio('Sounds.mp3');
+    audio.play();
   });
 
   const ctx = document.getElementById('numberChart').getContext('2d');
@@ -80,20 +85,21 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function updateChart() {
-    const dates = JSON.parse(localStorage.getItem('msUpdateDates')) || [];
+    const storedDates = JSON.parse(localStorage.getItem('msUpdateDates')) || [];
     
-    // If no dates are stored, set the numbers array to empty
-    if (dates.length === 0) {
-      numbers = [];
-    } else {
-      numbers = dates.map((_, index) => index + 1); // Generate numbers based on number of dates
-    }
-
-    numberChart.data.labels = dates.map(date => new Date(date).toLocaleDateString());
-    numberChart.data.datasets[0].data = numbers;
+    numberChart.data.labels = storedDates.map(date => new Date(date).toLocaleDateString());
+    numberChart.data.datasets[0].data = storedDates.map((_, index) => index + 1);
     numberChart.update();
   }
 
   // Initial update to display the chart
   updateChart();
+});
+
+
+
+
+document.getElementById('updateDateButton').addEventListener('click', function() {
+    var audio = new Audio('Sound2.mp3');
+    audio.play();
 });
