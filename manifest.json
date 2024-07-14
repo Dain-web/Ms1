@@ -3,7 +3,7 @@
     "name": "Hramas",
     "icons": [
       {
-        "src": "/images/icon.png",
+        "src": "/icon.png",
         "type": "image/png",
         "sizes": "192x192"
       },
